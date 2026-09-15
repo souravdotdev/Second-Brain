@@ -53,11 +53,14 @@ pnpm format:check   # prettier --check . — fails without writing, for CI
 
 ## Git hooks
 
-`husky` + `lint-staged` enforce lint/format automatically:
+`husky` + `lint-staged` + `commitlint` enforce lint/format/commit-message conventions automatically:
 
 - **`.husky/pre-commit`** runs `lint-staged`, which runs Prettier on every staged file and ESLint (`--fix`, with an explicit `--config` path per package — see below) on staged files under each app/package. Auto-fixed files are re-staged before the commit completes; an unfixable error blocks the commit.
+- **`.husky/commit-msg`** runs `commitlint --edit "$1"` against the commit message itself (git passes it the path to a temp file containing the message). A message that doesn't follow [Conventional Commits](https://www.conventionalcommits.org) (`type: subject`, e.g. `feat: add reminder scheduling`) blocks the commit — this repo's history was already using that convention before commitlint was added, so it's enforcing an existing norm, not introducing a new one.
 - **`.husky/pre-push`** runs `pnpm lint && pnpm check-types` across the whole repo (fast on repeat thanks to Turborepo's cache) as a last gate before code leaves the machine.
 
 `.lintstagedrc.json` lists one glob per package pointing ESLint at that package's own `eslint.config.js` explicitly, rather than letting ESLint auto-discover a config from the current working directory. This is necessary because ESLint 9's flat config resolves `eslint.config.js` relative to the process's CWD (not per-file, the way the old `.eslintrc` cascading did) — a single generic `eslint` invocation from the repo root wouldn't find the right config for a file under, say, `apps/web` vs `packages/db`.
+
+`commitlint.config.js` (root) just extends `@commitlint/config-conventional` — no project-specific rule overrides yet. If certain commit types beyond the standard set (`feat`, `fix`, `chore`, `refactor`, `docs`, etc.) or a scope convention (`feat(api): ...`) end up wanted, that's where to add them.
 
 Not set up: editor-level format-on-save config (`.vscode/settings.json`). Reasonable to add if it becomes a friction point.
