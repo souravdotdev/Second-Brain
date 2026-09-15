@@ -14,9 +14,13 @@
     "format:check": "prettier --check . --ignore-unknown",
     "db:generate": "turbo run db:generate --filter=@second-brain/db",
     "db:migrate": "turbo run db:migrate --filter=@second-brain/db",
-    "db:studio": "turbo run db:studio --filter=@second-brain/db"
+    "db:studio": "turbo run db:studio --filter=@second-brain/db",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "eslint": "^9.39.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
     "prettier": "^3.9.6",
     "turbo": "latest",
     "typescript": "^6.0.3"
