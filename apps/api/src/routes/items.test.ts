@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Fastify from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import type { ItemQueue, ItemRepository } from "@second-brain/core";
 import type { Item } from "@second-brain/types";
 import { itemRoutes } from "./items";
@@ -29,6 +30,8 @@ function buildApp() {
   const itemQueue: ItemQueue = { enqueueProcessing: vi.fn().mockResolvedValue(undefined) };
 
   const app = Fastify();
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
   app.register(itemRoutes({ itemRepository, itemQueue }));
 
   return { app, itemRepository, itemQueue };

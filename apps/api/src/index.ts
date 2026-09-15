@@ -1,11 +1,15 @@
 import "reflect-metadata";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { itemRoutes } from "./routes/items";
 import { dependencies } from "./composition";
 import { env } from "./env";
 
 const app = Fastify({ logger: true });
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
 
 await app.register(cors, { origin: true });
 await app.register(itemRoutes(dependencies));
