@@ -48,12 +48,19 @@ Fastify, BullMQ, Drizzle, Postgres, Redis, Next.js. These are configuration and 
 
 ## The composition root
 
-Concrete adapters have to get wired into the use cases _somewhere_ — that place is the **composition root**, the one spot in each app allowed to know about every concrete implementation at once.
+Concrete adapters have to get wired into the use cases _somewhere_ — that place is the **composition root**, the one spot in each app allowed to know about every concrete implementation at once. Wiring is done with an [InversifyJS](https://inversify.io) `Container`:
 
-- `apps/api/src/composition.ts` — instantiates `DrizzleItemRepository` and `BullMqItemQueue`, exports them as a `dependencies` object.
-- `apps/worker/src/composition.ts` — instantiates `DrizzleItemRepository` and `StubMetadataFetcher`.
+- `apps/api/src/composition.ts` — binds `TYPES.ItemRepository` → `DrizzleItemRepository` and `TYPES.ItemQueue` → `BullMqItemQueue` (both `inSingletonScope()`), resolves both via `container.get(...)`, and exports the result as a plain `dependencies` object.
+- `apps/worker/src/composition.ts` — binds `TYPES.ItemRepository` → `DrizzleItemRepository` and `TYPES.MetadataFetcher` → `StubMetadataFetcher`, same pattern.
 
-Both `apps/api/src/index.ts` and `apps/worker/src/index.ts` import `dependencies` from their composition root and pass it into a controller/handler **factory** (`itemRoutes(dependencies)`, `createProcessItemHandler(dependencies)`), which closes over it and passes it through to use-case calls. This is plain parameter injection — no DI framework or container library, since the wiring is small enough to stay explicit and readable as-is. If it grows substantially, reconsider then.
+`TYPES` (`packages/core/src/tokens.ts`) is a small registry of `Symbol`s, one per port — Inversify needs a runtime-visible identifier to bind against, since the port _interfaces_ (`ItemRepository`, `ItemQueue`, `MetadataFetcher`) are erased at compile time and don't exist at runtime. **Deliberately, `packages/core` does not depend on the `inversify` package itself** — `TYPES` is just plain `Symbol.for(...)` calls, so the use-case layer stays framework-free. Only the concrete adapter classes (`DrizzleItemRepository`, `BullMqItemQueue`, `StubMetadataFetcher`) are decorated with `@injectable()`, and only the two composition roots import `inversify`'s `Container`.
+
+Both `apps/api/src/index.ts` and `apps/worker/src/index.ts` import the resolved `dependencies` object from their composition root and pass it into a controller/handler **factory** (`itemRoutes(dependencies)`, `createProcessItemHandler(dependencies)`), which closes over it and passes it through to use-case calls unchanged. This means the container is purely an implementation detail of `composition.ts` — nothing in `packages/core`, the routes, or the job processor knows Inversify exists, or would need to change if it were swapped out later.
+
+**Setup requirements** (both `apps/api` and `apps/worker`):
+
+- `import "reflect-metadata";` as the literal first line of `src/index.ts` — it's a side-effecting polyfill that must run before any `@injectable()`-decorated class is evaluated, since Inversify's runtime dependency resolution depends on the metadata it attaches.
+- `experimentalDecorators: true` and `emitDecoratorMetadata: true` in `tsconfig.json` — added only to the packages that actually declare a decorated class (`packages/db`, `packages/queue`, `apps/worker`), as a package-local override rather than in the shared `library.json` base, so packages with no decorators don't silently get the flag.
 
 ## Where new code goes
 
@@ -73,3 +80,9 @@ Clean Architecture's indirection has a real cost — an extra port interface and
 - **Use cases are independently testable** — `saveItem`/`listItems`/`processItem` can be tested with hand-written fake `ItemRepository`/`ItemQueue`/`MetadataFetcher` implementations, no database or Redis required.
 - **Swapping infrastructure is a one-package change** — replacing Drizzle, or adding a second delivery mechanism (a CLI, a second API framework) alongside Fastify, touches `packages/db` or adds a new adapter, not the business logic itself.
 - **The dependency rule catches real bugs, not just style violations** — enforcing it during this refactor surfaced two pre-existing issues that loose typing had been hiding: the API was leaking raw `itemsToTags`/`itemsToCollections` join-table shapes into responses instead of the flat `tags`/`collections` the `ItemWithRelations` entity actually declares, and nothing was converting Drizzle's `Date` objects to the `string` the `Item` entity's `createdAt` field declares. Giving the repository an explicit interface to satisfy made TypeScript catch both immediately.
+
+## Why InversifyJS specifically
+
+At the current scale — two dependencies per app, wired in a ~10-line composition root — manually calling `new DrizzleItemRepository()` would do the same job with less ceremony, and that's what this project did initially. Inversify was added ahead of that need, on the expectation that the dependency graph will grow (more use cases, more ports, deeper chains where one adapter depends on another). At that point, manually sequencing every `new X(y, z)` call by hand gets error-prone; a container resolves the whole graph from a binding registry instead, and gives lifecycle control (singleton/transient/request scope) as a declared setting rather than something to hand-build.
+
+The design choice that matters most here: **only the composition roots and the concrete adapter classes know Inversify exists.** The use-case layer (`packages/core`) was deliberately kept plain-function-based rather than converted to injectable classes, specifically so it keeps the property that made it valuable in the first place — trivial unit testing by passing hand-written fake objects, no container, no decorators, no metadata reflection required. Introducing a DI container didn't have to mean making everything in the codebase container-aware, and it doesn't here.

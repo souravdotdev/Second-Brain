@@ -16,6 +16,8 @@
     "@second-brain/db": "workspace:*",
     "@second-brain/queue": "workspace:*",
     "fastify": "latest",
+    "inversify": "^8.2.3",
+    "reflect-metadata": "^0.2.2",
     "zod": "^4.6.5"
   },
   "devDependencies": {

@@ -39,9 +39,11 @@ Internal packages use **Just-in-Time (JIT) compilation** — they export TypeScr
 
 **Frontend** (`apps/web`): Next.js (App Router, Turbopack dev server), React, React DOM
 
-**Backend API** (`apps/api`): Fastify, `@fastify/cors`, Zod (validation), Drizzle ORM, `tsx` (dev/build runtime)
+**Backend API** (`apps/api`): Fastify, `@fastify/cors`, Zod (validation), `tsx` (dev/build runtime)
 
-**Worker** (`apps/worker`): BullMQ, Drizzle ORM, `tsx`
+**Worker** (`apps/worker`): BullMQ, `tsx`
+
+**Dependency injection** (`apps/api`, `apps/worker`, and the concrete adapters in `packages/db`/`packages/queue`): InversifyJS + `reflect-metadata` — see [Clean Architecture](./clean-architecture.md#the-composition-root)
 
 **Database** (`packages/db`): Drizzle ORM, drizzle-kit (migrations/studio CLI), `postgres` (postgres.js driver), PostgreSQL 16 (Docker)
 

@@ -18,6 +18,7 @@
     "@second-brain/core": "workspace:*",
     "@second-brain/types": "workspace:*",
     "drizzle-orm": "latest",
+    "inversify": "^8.2.3",
     "postgres": "latest",
     "zod": "^4.6.5"
   },

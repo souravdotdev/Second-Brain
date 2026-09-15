@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Worker } from "bullmq";
 import { QUEUE_NAMES, redisConnection } from "@second-brain/queue";
 import { createProcessItemHandler } from "./processors/process-item";

@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { desc, eq } from "drizzle-orm";
 import type { CreateItemRecord, ItemRepository } from "@second-brain/core";
 import type { Collection, Item, ItemStatus, ItemWithRelations, Tag } from "@second-brain/types";
@@ -20,6 +21,7 @@ function toCollection(row: typeof collections.$inferSelect): Collection {
 }
 
 /** Concrete adapter: implements the use-case layer's ItemRepository port with Drizzle + Postgres. */
+@injectable()
 export class DrizzleItemRepository implements ItemRepository {
   async create(record: CreateItemRecord): Promise<Item> {
     const [row] = await db.insert(items).values(record).returning();
