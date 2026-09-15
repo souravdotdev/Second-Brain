@@ -77,7 +77,7 @@ Ask these questions in order:
 
 Clean Architecture's indirection has a real cost — an extra port interface and adapter class for something that could be a single inline database call. It pays for itself here because:
 
-- **Use cases are independently testable** — `saveItem`/`listItems`/`processItem` can be tested with hand-written fake `ItemRepository`/`ItemQueue`/`MetadataFetcher` implementations, no database or Redis required.
+- **Use cases are independently testable** — `saveItem`/`listItems`/`processItem` are tested (`packages/core/src/use-cases/*.test.ts`) with hand-written fake `ItemRepository`/`ItemQueue`/`MetadataFetcher` implementations, no database or Redis required. The same pattern extends to the controllers: `apps/api`'s route tests and `apps/worker`'s processor test both call the route/handler factory directly with fake dependencies, entirely bypassing the real `composition.ts` and its live infrastructure. See [Testing](./testing.md).
 - **Swapping infrastructure is a one-package change** — replacing Drizzle, or adding a second delivery mechanism (a CLI, a second API framework) alongside Fastify, touches `packages/db` or adds a new adapter, not the business logic itself.
 - **The dependency rule catches real bugs, not just style violations** — enforcing it during this refactor surfaced two pre-existing issues that loose typing had been hiding: the API was leaking raw `itemsToTags`/`itemsToCollections` join-table shapes into responses instead of the flat `tags`/`collections` the `ItemWithRelations` entity actually declares, and nothing was converting Drizzle's `Date` objects to the `string` the `Item` entity's `createdAt` field declares. Giving the repository an explicit interface to satisfy made TypeScript catch both immediately.
 

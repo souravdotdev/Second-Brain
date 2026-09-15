@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@second-brain/types": "workspace:*",
@@ -21,10 +22,16 @@
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",
     "@second-brain/typescript-config": "workspace:*",
+    "@second-brain/vitest-config": "workspace:*",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.39.5",
-    "typescript": "^6.0.3"
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.1"
   }
 }

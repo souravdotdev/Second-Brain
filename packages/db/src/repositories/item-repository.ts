@@ -1,24 +1,10 @@
 import { injectable } from "inversify";
 import { desc, eq } from "drizzle-orm";
 import type { CreateItemRecord, ItemRepository } from "@second-brain/core";
-import type { Collection, Item, ItemStatus, ItemWithRelations, Tag } from "@second-brain/types";
+import type { Item, ItemStatus, ItemWithRelations } from "@second-brain/types";
 import { db } from "../client";
-import { collections, items, tags } from "../schema";
-
-// Postgres `timestamp` columns come back from Drizzle as native `Date`
-// objects; the domain entities in @second-brain/types declare `createdAt` as
-// `string`. Translating between the two is exactly the repository's job.
-function toItem(row: typeof items.$inferSelect): Item {
-  return { ...row, createdAt: row.createdAt.toISOString() };
-}
-
-function toTag(row: typeof tags.$inferSelect): Tag {
-  return { ...row, createdAt: row.createdAt.toISOString() };
-}
-
-function toCollection(row: typeof collections.$inferSelect): Collection {
-  return { ...row, createdAt: row.createdAt.toISOString() };
-}
+import { items } from "../schema";
+import { toCollection, toItem, toTag } from "./item-mappers";
 
 /** Concrete adapter: implements the use-case layer's ItemRepository port with Drizzle + Postgres. */
 @injectable()

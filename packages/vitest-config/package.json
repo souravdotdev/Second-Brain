@@ -1,0 +1,14 @@
+{
+  "name": "@second-brain/vitest-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./node": "./node.mjs",
+    "./react": "./react.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vitest": "^5.0.1"
+  }
+}

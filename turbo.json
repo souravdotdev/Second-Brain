@@ -12,6 +12,7 @@
     },
     "lint": {},
     "check-types": {},
+    "test": {},
     "db:generate": {
       "cache": false,
       "interactive": false

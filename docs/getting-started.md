@@ -61,6 +61,7 @@ To run just one app: `pnpm --filter web dev` (or `api`, `worker`).
 pnpm build         # production build for every app (tsc for api/worker, next build for web)
 pnpm lint          # eslint across every package
 pnpm check-types   # tsc --noEmit across every package
+pnpm test          # vitest run across every package — see docs/testing.md
 pnpm format        # prettier --write across the repo
 pnpm format:check  # prettier --check (CI-style, no writes)
 ```

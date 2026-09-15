@@ -10,6 +10,7 @@
   "scripts": {
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
+    "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
@@ -25,9 +26,11 @@
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",
     "@second-brain/typescript-config": "workspace:*",
+    "@second-brain/vitest-config": "workspace:*",
     "@types/node": "latest",
     "drizzle-kit": "latest",
     "eslint": "^9.39.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.1"
   }
 }

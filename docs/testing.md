@@ -1,0 +1,55 @@
+# Testing
+
+[Vitest](https://vitest.dev) is wired into every app and package that has runtime logic worth testing, following the same "shared base + per-package config" pattern as ESLint and TypeScript.
+
+## Shared config — `packages/vitest-config`
+
+Two presets, mirroring the eslint-config split between plain Node packages and `apps/web`:
+
+- `./node` (`node.mjs`) — plain Node test environment. Used by `packages/core`, `packages/db`, `packages/queue`, `apps/api`, `apps/worker`.
+- `./react` (`react.mjs`) — `jsdom` environment + `@vitejs/plugin-react`, built on top of `./node` via `mergeConfig`. Used by `packages/ui`, `apps/web`.
+
+Every package with tests has its own two-line `vitest.config.ts` importing one of these, and a `test` script (`vitest run`).
+
+```bash
+pnpm test   # vitest run in every package, via Turborepo
+```
+
+**Why the shared config files are `.mjs`, not `.ts`** (unlike every other shared config in this repo, which is `.ts`/`.js` extended via a package.json `exports` field): Vite's own config-file loader treats anything resolved through `node_modules` — which is how a pnpm workspace package resolves — as external and leaves it unbundled. A workspace package's raw `.ts` file can't be `import`ed directly by Node (no type-stripping applied), so a `vitest.config.ts` in one package importing a `.ts` file from `@second-brain/vitest-config` fails with `ERR_UNKNOWN_FILE_EXTENSION`. Plain `.mjs` sidesteps this since Node can load it natively, no transform needed. Each _consuming_ package's own `vitest.config.ts` stays `.ts` — that file is the true entry point Vite bundles directly, so it doesn't hit the same issue.
+
+**jsdom is pinned to `^29.1.1`, not the current `30.x`**: jsdom 30 requires Node `^22.22.2` or newer; this project targets Node `≥20`. jsdom 29 supports `^20.19.0`. If the project's Node baseline moves to 22+, this pin should move too.
+
+## What's actually tested, and why
+
+**`packages/core`** — the flagship test suite, and the direct payoff of the Clean Architecture refactor (see [Clean Architecture](./clean-architecture.md)): use cases take a `deps` object typed against plain interfaces, so tests pass hand-written fakes (usually `vi.fn()`-based) instead of a real database or Redis.
+
+- `detect-item-type.test.ts` — every URL-classification branch
+- `save-item.test.ts` — creates with the right record shape, enqueues the right job, propagates a repository failure without enqueueing
+- `list-items.test.ts` — delegates to the repository with the right arguments
+- `process-item.test.ts` — success path (status → ready with title) and failure path (status → failed, error rethrown)
+
+**`packages/db`** — `item-mappers.test.ts` tests `toItem`/`toTag`/`toCollection` (the Drizzle-`Date`-to-domain-`string` conversion functions) in isolation, with no database connection. These were deliberately extracted into their own `item-mappers.ts` file specifically so they could be imported without pulling in `../client` (which opens a real Postgres connection and validates `DATABASE_URL` at module load — see [Environment Variables](./environment-variables.md)). `DrizzleItemRepository` itself isn't unit-tested; its actual query logic needs a real or containerized Postgres, which isn't set up yet.
+
+**`packages/queue`** — wired (config + `test` script), but has no test file yet. `BullMqItemQueue` is a one-line wrapper around a live BullMQ `Queue` that needs a real Redis connection at import time — there's no pure logic to extract the way there was in `packages/db`. Its `vitest.config.ts` sets `passWithNoTests: true` so the empty suite doesn't fail the task.
+
+**`apps/api`** — `routes/items.test.ts` tests the Fastify routes via `app.inject()`, calling `itemRoutes(fakeDependencies)` directly rather than importing the real `composition.ts`. This avoids needing a live database/Redis entirely, since the route factory takes its dependencies as a parameter rather than reaching for a module-level singleton.
+
+**`apps/worker`** — `processors/process-item.test.ts` tests `createProcessItemHandler(fakeDependencies)` directly with a hand-built fake BullMQ `Job` (just an object with a `.data` field) — same reasoning as the api tests, no real queue needed.
+
+**`apps/web`** — `save-form.test.tsx` tests the `SaveForm` client component with `@testing-library/react` + `@testing-library/user-event`, mocking `next/navigation`'s `useRouter` and the `@/lib/api` module (so no real `fetch` call or `NEXT_PUBLIC_API_URL` env var is needed).
+
+**`packages/ui`** — `button.test.tsx` — a basic render/click/disabled-state test proving the `jsdom` + React preset works, independent of any app.
+
+**`packages/types`** — no tests, deliberately. It's pure type declarations with zero runtime code; there's nothing to execute.
+
+## Fakes over mocking libraries
+
+Every fake used across these tests is either a small hand-written object literal or a `vi.fn()` — no separate mocking framework, and no shared "fakes" package. Given how small each port interface is (1-3 methods), writing the fake inline in the test file that needs it is less overhead than maintaining a shared fixture module, and keeps each test file readable on its own.
+
+## Pre-push gate
+
+`.husky/pre-push` runs `pnpm lint && pnpm check-types && pnpm test` — tests are part of the last gate before code leaves the machine, alongside lint and type-checking (see [Code Quality](./code-quality.md)). They're not part of `pre-commit` (`lint-staged`), since running a full test suite on every commit — including ones that don't touch tested code — would slow down the fast, scoped pre-commit check down considerably.
+
+## A real bug this setup caught while being built
+
+Building the `apps/api` route tests surfaced a genuine regression risk: `tsc` compiles `*.test.ts` files into `dist/` alongside real source (nothing in the original `tsconfig.json` excluded them), and Vitest's default file-discovery glob picked up both the source test and its compiled `dist/` copy — silently double-running every test, and shipping test files in what's meant to be production build output. Fixed by excluding `**/*.test.ts`/`**/*.test.tsx` in `apps/api`'s and `apps/worker`'s `tsconfig.json`, plus excluding `**/dist/**` in the shared Vitest config as a second line of defense.
