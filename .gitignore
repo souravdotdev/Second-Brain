@@ -26,9 +26,6 @@ pnpm-debug.log*
 !.vscode/extensions.json
 .idea/
 
-## Drizzle
-packages/db/drizzle/
-
 .agents/
 
 ## Next.js generated agent docs

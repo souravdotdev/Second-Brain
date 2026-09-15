@@ -1,6 +1,6 @@
 # Database
 
-Postgres, accessed through [Drizzle ORM](https://orm.drizzle.team) via the `postgres` (postgres.js) driver. Schema lives in `packages/db/src/schema.ts`; the typed client is `packages/db/src/client.ts`, both re-exported from `packages/db/src/index.ts`.
+Postgres, accessed through [Drizzle ORM](https://orm.drizzle.team) via the `postgres` (postgres.js) driver. Schema lives in `packages/db/schema/index.ts` (a top-level directory, deliberately separate from `src/` — see [Migration workflow](#migration-workflow)); the typed client is `packages/db/src/client.ts`, both re-exported from `packages/db/src/index.ts`.
 
 ## Schema
 
@@ -25,11 +25,13 @@ Relations (Drizzle's `relations()` helper) are defined for every table, enabling
 - `item_type`: `article` | `tweet` | `image` | `video` | `pdf` | `link`
 - `item_status`: `processing` | `ready` | `failed`
 
-Item type is inferred server-side from the URL (see `apps/api/src/lib/detect-item-type.ts`) — the client never sends it directly.
+Item type is inferred server-side from the URL (see `packages/core/src/lib/detect-item-type.ts`) — the client never sends it directly.
 
 ## Migration workflow
 
-Drizzle Kit is configured in `packages/db/drizzle.config.ts`, pointed at `src/schema.ts` and outputting to `./drizzle` (gitignored — generated SQL, not hand-edited).
+Drizzle Kit is configured in `packages/db/drizzle.config.ts`, pointed at `schema/index.ts` and outputting to `./migrations`.
+
+Both `schema/` and `migrations/` are deliberately top-level directories in `packages/db`, siblings of `src/` rather than nested inside it — `schema/` because it's the package's public contract (what tables exist), and `migrations/` because generated SQL files aren't TypeScript source the way everything under `src/` is. **Unlike most generated output in this repo (`dist/`, `.next/`), migrations are tracked in git** — they're history, not a build artifact; losing them means losing the ability to reproduce the schema from scratch on a new environment. `.prettierignore` still excludes `packages/db/migrations/` so Prettier doesn't reformat drizzle-kit's own generated `meta/*.json` bookkeeping on every `pnpm format`, but that's a formatting exclusion, not a git one.
 
 ```bash
 pnpm db:generate   # diff the schema against the last migration, write a new SQL migration file
@@ -39,7 +41,7 @@ pnpm db:studio     # open Drizzle Studio, a local DB browser/editor
 
 These are all `turbo run <task> --filter=@second-brain/db` under the hood (see root `package.json`). Requires `packages/db/.env` to be set — see [Environment Variables](./environment-variables.md).
 
-**Workflow when you change the schema**: edit `packages/db/src/schema.ts` → `pnpm db:generate` (review the generated SQL in `packages/db/drizzle/`) → `pnpm db:migrate`. Never hand-edit generated migration files after they've been applied anywhere — generate a new one instead.
+**Workflow when you change the schema**: edit `packages/db/schema/index.ts` → `pnpm db:generate` (review the generated SQL in `packages/db/migrations/`) → `pnpm db:migrate` → commit the new migration files alongside the schema change. Never hand-edit generated migration files after they've been applied anywhere — generate a new one instead.
 
 ## Querying from apps
 
@@ -49,7 +51,7 @@ Per [Clean Architecture](./clean-architecture.md), `apps/api` and `apps/worker` 
 import { eq } from "drizzle-orm";
 import type { ItemRepository } from "@second-brain/core";
 import { db } from "../client";
-import { items } from "../schema";
+import { items } from "../../schema";
 
 export class DrizzleItemRepository implements ItemRepository {
   async updateStatus(itemId: string, status: ItemStatus) {

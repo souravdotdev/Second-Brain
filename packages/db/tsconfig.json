@@ -2,10 +2,9 @@
   "extends": "@second-brain/typescript-config/library.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src"],
+  "include": ["src", "schema"],
   "exclude": ["node_modules", "dist"]
 }

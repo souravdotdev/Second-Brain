@@ -44,7 +44,7 @@ Adapters translate between the use-case layer's abstractions and a specific tech
 
 ### Frameworks & Drivers — the outermost layer
 
-Fastify, BullMQ, Drizzle, Postgres, Redis, Next.js. These are configuration and setup, not business logic — `packages/db/src/client.ts` (the Drizzle client), `packages/db/src/schema.ts` (table definitions), `packages/queue/src/connection.ts` (the Redis connection), `apps/api/src/index.ts` (the Fastify server bootstrap).
+Fastify, BullMQ, Drizzle, Postgres, Redis, Next.js. These are configuration and setup, not business logic — `packages/db/src/client.ts` (the Drizzle client), `packages/db/schema/index.ts` (table definitions), `packages/queue/src/connection.ts` (the Redis connection), `apps/api/src/index.ts` (the Fastify server bootstrap).
 
 ## The composition root
 

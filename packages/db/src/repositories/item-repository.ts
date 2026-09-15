@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import type { CreateItemRecord, ItemRepository } from "@second-brain/core";
 import type { Item, ItemStatus, ItemWithRelations } from "@second-brain/types";
 import { db } from "../client";
-import { items } from "../schema";
+import { items } from "../../schema";
 import { toCollection, toItem, toTag } from "./item-mappers";
 
 /** Concrete adapter: implements the use-case layer's ItemRepository port with Drizzle + Postgres. */
