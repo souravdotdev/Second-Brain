@@ -14,10 +14,7 @@ export async function processItem(job: Job<ProcessItemJob>) {
   try {
     const title = new URL(sourceUrl).hostname;
 
-    await db
-      .update(items)
-      .set({ title, status: "ready" })
-      .where(eq(items.id, itemId));
+    await db.update(items).set({ title, status: "ready" }).where(eq(items.id, itemId));
   } catch (error) {
     await db.update(items).set({ status: "failed" }).where(eq(items.id, itemId));
     throw error;

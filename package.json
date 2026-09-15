@@ -10,11 +10,14 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
     "db:generate": "turbo run db:generate --filter=@second-brain/db",
     "db:migrate": "turbo run db:migrate --filter=@second-brain/db",
     "db:studio": "turbo run db:studio --filter=@second-brain/db"
   },
   "devDependencies": {
+    "prettier": "^3.9.6",
     "turbo": "latest",
     "typescript": "^6.0.3"
   }

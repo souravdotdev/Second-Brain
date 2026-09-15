@@ -1,12 +1,4 @@
-import {
-  boolean,
-  pgEnum,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const itemTypeEnum = pgEnum("item_type", [

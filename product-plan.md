@@ -1,5 +1,6 @@
 # Universal Save — Product Plan
-*(working title — naming ideas at the bottom)*
+
+_(working title — naming ideas at the bottom)_
 
 ## 1. One-liner
 
@@ -7,7 +8,7 @@ A place to save anything you find online — link, tweet, article, PDF, video �
 
 ## 2. The Problem
 
-People save things constantly (tabs, tweets, screenshots, "read later" links) but almost never go back to them. Bookmarks become a graveyard. The failure isn't *saving* — it's **retrieval**: nothing resurfaces the item at the moment it would actually be useful, and nothing connects it to the other things you've saved on the same topic.
+People save things constantly (tabs, tweets, screenshots, "read later" links) but almost never go back to them. Bookmarks become a graveyard. The failure isn't _saving_ — it's **retrieval**: nothing resurfaces the item at the moment it would actually be useful, and nothing connects it to the other things you've saved on the same topic.
 
 ## 3. Target User
 
@@ -17,11 +18,11 @@ You want this open to anyone — that's the right long-term vision, and the "pas
 
 You picked all three as differentiators. That's a legitimate 12-18 month vision — but sequence them, don't build them in parallel:
 
-| Pillar | What it means | When |
-|---|---|---|
-| Effortless capture | Paste any link, any format, zero friction | v1 |
-| Resurfacing | Reminds you to revisit saved items | v1 (user-set reminders) |
-| Semantic search & knowledge graph | Find and visually connect saved items by meaning, not just keywords | v2+ |
+| Pillar                            | What it means                                                       | When                    |
+| --------------------------------- | ------------------------------------------------------------------- | ----------------------- |
+| Effortless capture                | Paste any link, any format, zero friction                           | v1                      |
+| Resurfacing                       | Reminds you to revisit saved items                                  | v1 (user-set reminders) |
+| Semantic search & knowledge graph | Find and visually connect saved items by meaning, not just keywords | v2+                     |
 
 ## 5. Competitive Landscape
 
@@ -38,6 +39,7 @@ Nobody currently owns "one-click save any format + AI tags + custom resurfacing"
 ## 6. MVP Scope (v1) — Web app only, no extension yet
 
 **In scope:**
+
 - Paste-a-link capture (article, tweet, image, YouTube video, PDF link) via a web app — no browser extension required
 - Automatic metadata fetch per type (Open Graph for articles, oEmbed for tweets, YouTube API for videos, text extraction for PDFs)
 - Automatic AI tag suggestions, editable/overridable by the user
@@ -47,6 +49,7 @@ Nobody currently owns "one-click save any format + AI tags + custom resurfacing"
 - A simple feed/list view of saved items, filterable by tag/collection
 
 **Explicitly out of scope for v1** (this is the discipline that keeps the launch shippable):
+
 - Browser extension
 - Mobile app / share-sheet
 - Knowledge graph visualization
@@ -57,11 +60,13 @@ Nobody currently owns "one-click save any format + AI tags + custom resurfacing"
 ## 7. Roadmap After v1
 
 **v2 — Capture expansion + smarter retrieval**
+
 - Browser extension (this is where "save anything" stops requiring a copy-paste step)
 - Semantic search (embeddings) alongside keyword search
 - Highlight/annotation system for articles and PDFs
 
 **v3 — The knowledge graph pillar**
+
 - Topic clustering across saved items
 - Graph visualization of related items
 - "Related items" surfaced automatically when viewing any saved item
@@ -93,6 +98,7 @@ Matches the stack you already sketched:
 **Frontend:** Next.js (React) — web app first, no extension/mobile build needed for v1.
 
 **Backend:** Node or Python service handling:
+
 - Ingestion API (receives pasted URL, kicks off processing)
 - Metadata/content extraction per source type
 - AI tagging calls (LLM API)
@@ -101,6 +107,7 @@ Matches the stack you already sketched:
 **Queue workers:** essential from day one, not a "later" optimization — link fetching, PDF parsing, and AI tagging are all slow/unreliable enough that they can't block the save action. User pastes a link → item appears instantly as "processing" → worker fills in metadata/tags asynchronously.
 
 **Storage:**
+
 - Postgres for structured data (Users, Items, Tags, Collections, Reminders)
 - Object storage (S3-compatible) for saved images/PDFs
 - Vector DB — can be deferred to v2 (Postgres + pgvector is enough to start when you get there; no need for a dedicated vector DB at v1 scale)
@@ -110,10 +117,12 @@ Matches the stack you already sketched:
 ## 11. Business Model — Freemium
 
 **Free tier** (needs to be genuinely useful, or freemium doesn't convert):
+
 - Item cap (e.g. 100–150 saved items)
 - Manual reminders, basic search, tagging
 
 **Paid tier:**
+
 - Unlimited items
 - Semantic search + knowledge graph (once built)
 - Browser extension + mobile capture
