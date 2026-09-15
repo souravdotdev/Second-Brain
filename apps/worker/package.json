@@ -1,0 +1,28 @@
+{
+  "name": "worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@second-brain/db": "workspace:*",
+    "@second-brain/queue": "workspace:*",
+    "@second-brain/types": "workspace:*",
+    "bullmq": "latest",
+    "drizzle-orm": "latest"
+  },
+  "devDependencies": {
+    "@second-brain/eslint-config": "workspace:*",
+    "@second-brain/typescript-config": "workspace:*",
+    "@types/node": "latest",
+    "eslint": "^9.39.5",
+    "tsx": "latest",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@second-brain/queue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "bullmq": "latest",
+    "ioredis": "latest"
+  },
+  "devDependencies": {
+    "@second-brain/eslint-config": "workspace:*",
+    "@second-brain/typescript-config": "workspace:*",
+    "@second-brain/types": "workspace:*",
+    "@types/node": "latest",
+    "eslint": "^9.39.5",
+    "typescript": "^6.0.3"
+  }
+}

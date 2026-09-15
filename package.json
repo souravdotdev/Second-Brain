@@ -1,0 +1,21 @@
+{
+  "name": "second-brain",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "db:generate": "turbo run db:generate --filter=@second-brain/db",
+    "db:migrate": "turbo run db:migrate --filter=@second-brain/db",
+    "db:studio": "turbo run db:studio --filter=@second-brain/db"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "^6.0.3"
+  }
+}

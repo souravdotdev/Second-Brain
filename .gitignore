@@ -1,0 +1,35 @@
+## Dependencies
+node_modules/
+
+## Turborepo
+.turbo/
+
+## Build outputs
+dist/
+.next/
+out/
+
+## Env
+.env
+.env.local
+.env.*.local
+
+## Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+## Editor / OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+## Drizzle
+packages/db/drizzle/
+
+.agents/
+
+## Next.js generated agent docs
+apps/*/AGENTS.md
+apps/*/CLAUDE.md

@@ -1,0 +1,21 @@
+{
+  "name": "@second-brain/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.js",
+    "./next-js": "./next.js",
+    "./node-library": "./node-library.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@next/eslint-plugin-next": "latest",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "latest",
+    "eslint-config-prettier": "latest",
+    "globals": "latest",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "latest"
+  }
+}
