@@ -11,11 +11,10 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@second-brain/core": "workspace:*",
     "@second-brain/db": "workspace:*",
     "@second-brain/queue": "workspace:*",
-    "@second-brain/types": "workspace:*",
-    "bullmq": "latest",
-    "drizzle-orm": "latest"
+    "bullmq": "latest"
   },
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",

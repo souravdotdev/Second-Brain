@@ -1,5 +1,5 @@
 {
-  "name": "@second-brain/queue",
+  "name": "@second-brain/core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,10 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@second-brain/core": "workspace:*",
-    "bullmq": "latest",
-    "ioredis": "latest",
-    "zod": "^4.6.5"
+    "@second-brain/types": "workspace:*"
   },
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",

@@ -4,6 +4,8 @@ Fastify server in `apps/api`. Entry point `src/index.ts`; item routes in `src/ro
 
 Base URL locally: `http://localhost:4000` (from `PORT` in `apps/api/.env`).
 
+**Routes are thin controllers, not where the logic lives.** Per [Clean Architecture](./clean-architecture.md), `src/routes/items.ts` only parses/validates the HTTP request and calls a use case from `@second-brain/core` — it never touches Drizzle or BullMQ directly. Concrete adapters (`DrizzleItemRepository`, `BullMqItemQueue`) are wired up once in `src/composition.ts` and passed into the routes. If you're looking for the actual save/list logic, it's in `packages/core/src/use-cases`, not here.
+
 ## Auth (placeholder)
 
 There's no real authentication yet. Every route reads a user id from an `x-user-id` header instead of a session/token — marked with a `TODO` in the code (`apps/api/src/routes/items.ts`) to replace once auth is wired up. The id must correspond to an existing row in the `users` table (there's a foreign key from `items.userId`), so you can't just pass an arbitrary UUID — seed a user first.
@@ -95,7 +97,7 @@ Note: `collectionId` is accepted and validated but not yet used to actually atta
 
 ## Item type detection
 
-`detectItemType(url)` (`apps/api/src/lib/detect-item-type.ts`) infers the type from the URL, server-side, so the client never has to specify it:
+`detectItemType(url)` (`packages/core/src/lib/detect-item-type.ts` — a business rule, not an HTTP concern, so it lives in the use-case layer and is called from inside the `saveItem` use case) infers the type from the URL, server-side, so the client never has to specify it:
 
 | Condition                                                                          | Type      |
 | ---------------------------------------------------------------------------------- | --------- |

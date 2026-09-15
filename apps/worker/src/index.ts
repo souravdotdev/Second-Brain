@@ -1,8 +1,9 @@
 import { Worker } from "bullmq";
 import { QUEUE_NAMES, redisConnection } from "@second-brain/queue";
-import { processItem } from "./processors/process-item";
+import { createProcessItemHandler } from "./processors/process-item";
+import { dependencies } from "./composition";
 
-const worker = new Worker(QUEUE_NAMES.ITEM_PROCESSING, processItem, {
+const worker = new Worker(QUEUE_NAMES.ITEM_PROCESSING, createProcessItemHandler(dependencies), {
   connection: redisConnection,
   concurrency: 5,
 });

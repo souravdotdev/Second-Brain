@@ -12,12 +12,11 @@
   },
   "dependencies": {
     "@fastify/cors": "latest",
+    "@second-brain/core": "workspace:*",
     "@second-brain/db": "workspace:*",
     "@second-brain/queue": "workspace:*",
-    "@second-brain/types": "workspace:*",
-    "drizzle-orm": "latest",
     "fastify": "latest",
-    "zod": "latest"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",

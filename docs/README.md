@@ -3,6 +3,7 @@
 Reference docs for the `second-brain` monorepo, covering what's been set up and why.
 
 - [Architecture](./architecture.md) — monorepo layout, tech stack, and the architectural pattern in use
+- [Clean Architecture](./clean-architecture.md) — the layering convention (entities/use cases/adapters), strictly enforced, and where new code should go
 - [Getting Started](./getting-started.md) — local setup: prerequisites, install, running services
 - [Environment Variables](./environment-variables.md) — every variable, which app/package needs it, and why
 - [Database](./database.md) — schema, data model, and the Drizzle migration workflow

@@ -15,8 +15,11 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@second-brain/core": "workspace:*",
+    "@second-brain/types": "workspace:*",
     "drizzle-orm": "latest",
-    "postgres": "latest"
+    "postgres": "latest",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",

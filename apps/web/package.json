@@ -15,7 +15,8 @@
     "@second-brain/ui": "workspace:*",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@second-brain/eslint-config": "workspace:*",

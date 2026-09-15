@@ -43,13 +43,20 @@ These are all `turbo run <task> --filter=@second-brain/db` under the hood (see r
 
 ## Querying from apps
 
-`apps/api` and `apps/worker` both import the `db` client and schema tables directly from `@second-brain/db`:
+Per [Clean Architecture](./clean-architecture.md), `apps/api` and `apps/worker` never import `db` or the schema tables directly — only `packages/db`'s `DrizzleItemRepository` (`src/repositories/item-repository.ts`) does. It implements the `ItemRepository` port interface defined in `packages/core`, and is the only place Drizzle query syntax appears for the items domain:
 
 ```ts
-import { db, items } from "@second-brain/db";
 import { eq } from "drizzle-orm";
+import type { ItemRepository } from "@second-brain/core";
+import { db } from "../client";
+import { items } from "../schema";
 
-await db.update(items).set({ status: "ready" }).where(eq(items.id, itemId));
+export class DrizzleItemRepository implements ItemRepository {
+  async updateStatus(itemId: string, status: ItemStatus) {
+    await db.update(items).set({ status }).where(eq(items.id, itemId));
+  }
+  // ...
+}
 ```
 
-There's no repository/data-access abstraction layer — see the note on architectural pattern in [Architecture](./architecture.md) for why, and when that would be worth changing.
+The repository is also responsible for translating Drizzle's raw row shape into the domain entities `packages/types` declares — e.g. converting `createdAt` from Drizzle's native `Date` to the `string` the `Item` entity expects, and flattening the `itemsToTags`/`itemsToCollections` join-table rows into the `tags`/`collections` arrays `ItemWithRelations` actually declares. `apps/api` and `apps/worker` each instantiate `DrizzleItemRepository` once, in their own `src/composition.ts`, and pass it into use cases from `@second-brain/core`.

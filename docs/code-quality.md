@@ -51,6 +51,13 @@ pnpm format:check   # prettier --check . — fails without writing, for CI
 
 `eslint-config-prettier` is included in both shared ESLint configs specifically so ESLint never flags a formatting choice that Prettier would make differently — ESLint owns correctness/best-practice rules, Prettier owns whitespace/quotes/line-wrapping. There's no actual overlap or conflict by construction.
 
-## Not set up yet
+## Git hooks
 
-No pre-commit hook (husky + lint-staged) enforcing any of this automatically on commit, and no editor-level format-on-save config (`.vscode/settings.json`). Both are reasonable additions if inconsistent formatting/lint failures start slipping through in practice.
+`husky` + `lint-staged` enforce lint/format automatically:
+
+- **`.husky/pre-commit`** runs `lint-staged`, which runs Prettier on every staged file and ESLint (`--fix`, with an explicit `--config` path per package — see below) on staged files under each app/package. Auto-fixed files are re-staged before the commit completes; an unfixable error blocks the commit.
+- **`.husky/pre-push`** runs `pnpm lint && pnpm check-types` across the whole repo (fast on repeat thanks to Turborepo's cache) as a last gate before code leaves the machine.
+
+`.lintstagedrc.json` lists one glob per package pointing ESLint at that package's own `eslint.config.js` explicitly, rather than letting ESLint auto-discover a config from the current working directory. This is necessary because ESLint 9's flat config resolves `eslint.config.js` relative to the process's CWD (not per-file, the way the old `.eslintrc` cascading did) — a single generic `eslint` invocation from the repo root wouldn't find the right config for a file under, say, `apps/web` vs `packages/db`.
+
+Not set up: editor-level format-on-save config (`.vscode/settings.json`). Reasonable to add if it becomes a friction point.

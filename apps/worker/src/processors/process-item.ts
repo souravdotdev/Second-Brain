@@ -1,24 +1,15 @@
 import type { Job } from "bullmq";
-import { db, items } from "@second-brain/db";
-import { eq } from "drizzle-orm";
-import type { ProcessItemJob } from "@second-brain/queue";
+import type { ProcessItemJob } from "@second-brain/core";
+import { processItem as processItemUseCase } from "@second-brain/core";
+import type { Dependencies } from "../composition";
 
-/**
- * Fetches metadata for the item's source URL and generates AI tag
- * suggestions. Stubbed for now — replace with real extraction (Open Graph /
- * oEmbed / YouTube API / PDF text extraction) and an LLM tagging call.
- */
-export async function processItem(job: Job<ProcessItemJob>) {
-  const { itemId, sourceUrl, type } = job.data;
+/** Delivery-mechanism adapter: unwraps a BullMQ job and calls the use case. */
+export function createProcessItemHandler(deps: Dependencies) {
+  return async function processItem(job: Job<ProcessItemJob>) {
+    const { itemId, sourceUrl } = job.data;
 
-  try {
-    const title = new URL(sourceUrl).hostname;
+    await processItemUseCase(deps, { itemId, sourceUrl });
 
-    await db.update(items).set({ title, status: "ready" }).where(eq(items.id, itemId));
-  } catch (error) {
-    await db.update(items).set({ status: "failed" }).where(eq(items.id, itemId));
-    throw error;
-  }
-
-  return { itemId, type };
+    return { itemId };
+  };
 }

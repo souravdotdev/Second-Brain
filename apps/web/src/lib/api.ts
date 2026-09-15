@@ -1,6 +1,7 @@
 import type { ItemWithRelations } from "@second-brain/types";
+import { env } from "../env";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = env.NEXT_PUBLIC_API_URL;
 
 // TODO: replace with the authenticated user's id once auth is wired up.
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000000";

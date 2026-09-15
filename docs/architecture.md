@@ -11,9 +11,10 @@ apps/
   worker/   BullMQ consumer that processes saved items
 
 packages/
-  db/                 Drizzle ORM schema + Postgres client
-  queue/              Shared BullMQ queue/job-type definitions
-  types/              Shared domain types (Item, Tag, Collection, Reminder, ...)
+  core/               Use cases + port interfaces (the Clean Architecture application layer)
+  db/                 Drizzle ORM schema, Postgres client, and the ItemRepository adapter
+  queue/              BullMQ setup and the ItemQueue adapter
+  types/              Shared domain entities (Item, Tag, Collection, Reminder, ...)
   ui/                 Shared React components
   eslint-config/      Shared flat ESLint configs
   typescript-config/  Shared tsconfig bases
@@ -26,7 +27,8 @@ Internal packages use **Just-in-Time (JIT) compilation** — they export TypeScr
 ## Why this split
 
 - **`packages/types`** has zero dependencies and is imported by both the frontend and backend, so request/response shapes for the paste-a-link flow can't drift out of sync between `apps/web` and `apps/api`.
-- **`packages/queue`** exists so the job payload shape (`ProcessItemJob`) and queue name constants are defined once and shared between the producer (`apps/api`, which enqueues) and the consumer (`apps/worker`, which processes) — a mismatch there would fail silently at runtime otherwise.
+- **`packages/core`** holds the actual business logic (use cases) and the port interfaces infrastructure must implement — it depends only on `packages/types`, never on Drizzle, BullMQ, or Fastify. See [Clean Architecture](./clean-architecture.md) for the full layering.
+- **`packages/queue`** exists so the job payload shape (`ProcessItemJob`, defined in `packages/core`) and queue name constants are defined once and shared between the producer (`apps/api`, which enqueues) and the consumer (`apps/worker`, which processes) — a mismatch there would fail silently at runtime otherwise.
 - **`packages/db`** centralizes the Drizzle schema so both `apps/api` and `apps/worker` query the same tables through the same typed client, rather than each maintaining its own connection/schema.
 
 ## Tech stack
@@ -55,8 +57,6 @@ See [Code Quality](./code-quality.md) for how lint/format/type-check are wired t
 
 ## Architectural pattern
 
-This is **not** Clean Architecture / ports-and-adapters. It's pragmatic layering by _deployable unit_ (apps) and _shared concern_ (packages) — not a strict dependency-inversion structure within each app.
+This project follows **Clean Architecture** (ports-and-adapters), strictly and as a standing convention for every future change — not just the current code. Dependencies point inward only: infrastructure (Fastify routes, Drizzle, BullMQ) depends on the use-case layer, never the reverse. See [Clean Architecture](./clean-architecture.md) for the full layer breakdown, the dependency rule, and where new code should go.
 
-Concretely: in `apps/api/src/routes/items.ts`, the route handler imports the Drizzle `db` client and the BullMQ queue directly and uses them inline. There's no repository interface, no use-case/interactor layer, and no dependency injection — the HTTP layer is directly coupled to the persistence and queue infrastructure.
-
-This is a deliberate tradeoff for the project's current size (three small services, single developer, v1 MVP scope per the product plan). Clean Architecture's indirection pays for itself when infrastructure is expected to change (e.g. swapping Drizzle for something else) or when business logic needs heavy isolated unit testing — neither applies yet. If routes start accumulating real business logic that gets tangled with HTTP/DB concerns as features grow, that's the signal to introduce a thin use-case layer between routes and `@second-brain/db` — not before.
+This wasn't the original design — the project started with routes calling Drizzle/BullMQ directly, a deliberate simplification for early v1 scope. It was refactored to full Clean Architecture once the project's direction called for stricter discipline. `packages/core` holds the business logic and port interfaces; `packages/db` and `packages/queue` provide concrete adapters; `apps/api` and `apps/worker` each have a `src/composition.ts` composition root that wires concrete adapters into the use cases, and their route handlers / job processors are thin controllers that only call use cases.

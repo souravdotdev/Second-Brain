@@ -32,23 +32,20 @@ importers:
       '@fastify/cors':
         specifier: latest
         version: 11.3.0
+      '@second-brain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@second-brain/db':
         specifier: workspace:*
         version: link:../../packages/db
       '@second-brain/queue':
         specifier: workspace:*
         version: link:../../packages/queue
-      '@second-brain/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      drizzle-orm:
-        specifier: latest
-        version: 0.45.2(postgres@3.4.9)
       fastify:
         specifier: latest
         version: 5.12.4
       zod:
-        specifier: latest
+        specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
       '@second-brain/eslint-config':
@@ -87,6 +84,9 @@ importers:
       react-dom:
         specifier: latest
         version: 19.3.0(react@19.3.0)
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@second-brain/eslint-config':
         specifier: workspace:*
@@ -112,21 +112,18 @@ importers:
 
   apps/worker:
     dependencies:
+      '@second-brain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@second-brain/db':
         specifier: workspace:*
         version: link:../../packages/db
       '@second-brain/queue':
         specifier: workspace:*
         version: link:../../packages/queue
-      '@second-brain/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       bullmq:
         specifier: latest
         version: 6.3.6(ioredis@6.0.0)
-      drizzle-orm:
-        specifier: latest
-        version: 0.45.2(postgres@3.4.9)
     devDependencies:
       '@second-brain/eslint-config':
         specifier: workspace:*
@@ -147,14 +144,45 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/core:
+    dependencies:
+      '@second-brain/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@second-brain/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@second-brain/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: latest
+        version: 26.5.1
+      eslint:
+        specifier: ^9.39.5
+        version: 9.39.5
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/db:
     dependencies:
+      '@second-brain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@second-brain/types':
+        specifier: workspace:*
+        version: link:../types
       drizzle-orm:
         specifier: latest
         version: 0.45.2(postgres@3.4.9)
       postgres:
         specifier: latest
         version: 3.4.9
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@second-brain/eslint-config':
         specifier: workspace:*
@@ -204,19 +232,22 @@ importers:
 
   packages/queue:
     dependencies:
+      '@second-brain/core':
+        specifier: workspace:*
+        version: link:../core
       bullmq:
         specifier: latest
         version: 6.3.6(ioredis@6.0.0)
       ioredis:
         specifier: latest
         version: 6.0.0
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@second-brain/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@second-brain/types':
-        specifier: workspace:*
-        version: link:../types
       '@second-brain/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
