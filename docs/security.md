@@ -1,4 +1,4 @@
-# Security Middleware
+# Security
 
 `apps/api` (the only HTTP-facing service besides `apps/web`) registers three plugins, all before any route: [`@fastify/cors`](https://github.com/fastify/fastify-cors), [`@fastify/helmet`](https://github.com/fastify/fastify-helmet), [`@fastify/rate-limit`](https://github.com/fastify/fastify-rate-limit). `apps/worker` has no HTTP surface — it only consumes BullMQ jobs — so no middleware applies there.
 
@@ -34,3 +34,21 @@ export const rateLimitRedis: Redis = redisConnection.duplicate({
 `next.config.ts`'s `headers()` sets, on every route: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`. Confirmed present on a real `next build` + `next start` response via `curl -I`.
 
 **No CSP here either, for now** — deliberately deferred, not forgotten. Unlike `apps/api`, a CSP on `apps/web` _would_ be meaningful (it serves real HTML), but getting one right for a Next.js app means handling nonces for inline scripts/hydration data correctly, and verifying it doesn't break the dev server, Turbopack, or the production build — real work that deserves its own dedicated pass with actual browser testing, not a policy added blind alongside unrelated middleware.
+
+## Dependency updates (Dependabot)
+
+`.github/dependabot.yml` — GitHub's native bot, two independent jobs:
+
+- **Security updates** run regardless of the schedule below: the moment a dependency in this repo has a CVE published against it (GitHub's own advisory database, not a third-party feed), Dependabot opens a PR bumping just that package to the patched version.
+- **Version updates** run weekly (Mondays): checks for newer versions of everything and opens PRs to bump them.
+
+This matters more here than in a typical repo because most dependencies in this monorepo are deliberately **pinned** rather than left on `"latest"` — done repeatedly throughout this project's setup specifically because `"latest"` kept resolving to versions that broke on install (ESLint 10 vs. `typescript-eslint`, TypeScript 7 vs. `typescript-eslint`, jsdom 30 vs. Node 20 — see [Code Quality](./code-quality.md) and [Testing](./testing.md)). Pinning fixes the immediate breakage but means nothing moves forward on its own afterward — Dependabot is what actually keeps pinned versions from just going stale indefinitely.
+
+**Two ecosystems configured**, both at the repo root:
+
+- `npm` — covers every `package.json` in the pnpm workspace through the single root `pnpm-lock.yaml`. One entry at `directory: "/"` is enough; Dependabot discovers the whole workspace from there rather than needing one entry per package. (`"npm"` is just the ecosystem's YAML key — it auto-detects pnpm from the lockfile.)
+- `docker` — the `postgres:16-alpine` / `redis:7-alpine` base images referenced in `docker-compose.yml`.
+
+**Noise control**: minor/patch bumps (low-risk, and numerous across 11 workspace packages) are grouped into a single weekly PR via the `minor-and-patch` group. Major version bumps are deliberately left ungrouped — they're the ones actually likely to need a real look before merging, so bundling them together would hide that.
+
+**Not configured**: a `github-actions` ecosystem entry — there's no CI workflow in `.github/workflows/` yet for it to track. Trivial to add once one exists.

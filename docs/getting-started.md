@@ -68,6 +68,8 @@ pnpm format:check  # prettier --check (CI-style, no writes)
 
 All of these (except `format`/`format:check`, which run Prettier directly rather than through Turborepo — see [Code Quality](./code-quality.md)) are Turborepo tasks, so results are cached and only re-run for packages whose inputs actually changed.
 
+These same checks (plus commit-message linting) also run automatically in CI on every push and PR — see [Code Quality](./code-quality.md#continuous-integration).
+
 **Known issue — `apps/api`/`apps/worker`'s `start` script doesn't work yet.** `pnpm build` (`tsc`) succeeds, but running the compiled output directly (`node dist/index.js`, what `start` does) currently fails with `ERR_MODULE_NOT_FOUND`. Node's ESM resolver requires relative imports in compiled output to include an explicit `.js` extension (e.g. `from "./routes/items.js"`); the source uses extensionless imports (`from "./routes/items"`), and `tsc` doesn't rewrite these for Node ESM output on its own. `dev` (via `tsx`) has always masked this, since `tsx` resolves extensionless imports the same way bundlers do — this gap has existed since these apps were first scaffolded, just never actually exercised until it was checked directly. Not fixed yet; needs a decision (add `.js` extensions to every relative import, switch `moduleResolution` to `nodenext`, or bundle for production with something like `tsup` instead of raw `tsc`) before these services can actually run in production as compiled output.
 
 ## Smoke-testing the save flow end to end

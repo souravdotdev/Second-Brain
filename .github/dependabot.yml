@@ -1,0 +1,34 @@
+version: 2
+
+updates:
+  # pnpm workspace — a single entry at the root covers every package.json in
+  # the monorepo, since they all share one pnpm-lock.yaml. Dependabot
+  # auto-detects pnpm from the lockfile; "npm" is just the ecosystem's YAML
+  # key regardless of which package manager it actually finds.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      # Minor/patch bumps are low-risk and numerous — bundle them into one
+      # PR a week instead of one PR per package. Majors stay ungrouped since
+      # they're the ones actually likely to need a real look before merging.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker base images referenced in docker-compose.yml (postgres, redis).
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

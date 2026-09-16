@@ -72,3 +72,16 @@ This is a lower-level safety net than Prettier, not a replacement for it — Pre
 `commitlint.config.js` (root) just extends `@commitlint/config-conventional` — no project-specific rule overrides yet. If certain commit types beyond the standard set (`feat`, `fix`, `chore`, `refactor`, `docs`, etc.) or a scope convention (`feat(api): ...`) end up wanted, that's where to add them.
 
 Not set up: editor-level format-on-save config (`.vscode/settings.json`). Reasonable to add if it becomes a friction point.
+
+## Continuous Integration
+
+`.github/workflows/ci.yml` — two jobs, the machine-enforced backstop for exactly what's already enforced locally (above). Local hooks only run on commits made on a machine that has them installed; CI catches `--no-verify`, a fork PR where hooks never ran, or anything else that slipped past `.husky/`.
+
+- **`ci`** (every push to `main`, every PR): installs with `pnpm install --frozen-lockfile` (fails loudly on any `package.json`/`pnpm-lock.yaml` drift, rather than silently rewriting the lockfile), then `pnpm format:check` first since it's the fastest check, then a single `pnpm exec turbo run lint check-types test build` — the same command used for local verification throughout this project, letting Turborepo parallelize across all 11 workspace packages respecting their dependency graph rather than four separate sequential invocations. No Postgres/Redis service containers are configured — the whole point of the fakes-over-real-infra approach in [Testing](./testing.md) is that the suite doesn't need them.
+- **`commitlint`** (PRs only): checks out full history and lints every commit in the PR's range against the same `commitlint.config.js` used locally — the CI-side version of what `.husky/commit-msg` already does, for the cases that hook can't reach.
+
+There's no Turborepo Remote Cache token configured, so without help every CI run would start fully cold. `.turbo` (the local task-output cache — confirmed by inspection to be where Turborepo actually writes cached results, at the repo root) is cached across runs via `actions/cache`, keyed on the commit SHA with an OS-level restore-key fallback, so unchanged packages skip re-running instead of every run paying the full 26-task cost.
+
+**Verified directly before relying on it**: every command the workflow runs was executed locally in the same order (including a genuinely cold-cache `turbo run` after deleting every `.turbo` directory in the repo, confirming a first CI run would actually pass, followed by a repeat run confirming all 26 tasks come back from cache), and the workflow file itself was validated with `actionlint` (a purpose-built GitHub Actions linter — checks expression syntax, job/step schema, and shellchecks every `run:` block), not just generic YAML parsing.
+
+**Not set up**: any deploy/CD step (no hosting platform is chosen yet, and `apps/api`/`apps/worker`'s compiled `start` script doesn't run in production yet — see [Getting Started](./getting-started.md)'s "Known issue"), and branch protection requiring the `ci` check before merge (a GitHub repo _setting_, not a file — worth turning on once this workflow has run successfully at least once).

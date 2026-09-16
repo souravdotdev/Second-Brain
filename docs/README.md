@@ -10,7 +10,7 @@ Reference docs for the `second-brain` monorepo, covering what's been set up and 
 - [API](./api.md) — HTTP endpoint reference for `apps/api`
 - [Queue & Background Jobs](./queue.md) — how item processing is queued and consumed
 - [Code Quality](./code-quality.md) — linting, formatting, and type-checking conventions
-- [Security Middleware](./security.md) — CORS, helmet, rate limiting, and the response headers on `apps/web`
+- [Security](./security.md) — CORS, helmet, rate limiting, `apps/web`'s response headers, and Dependabot
 - [Testing](./testing.md) — Vitest setup, what's tested and why, and the fakes-over-mocking-libraries convention
 
 Each file stands on its own — start with whichever is relevant, or read [Architecture](./architecture.md) first for the full-picture view.
