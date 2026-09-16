@@ -14,7 +14,7 @@
     "@second-brain/eslint-config": "workspace:*",
     "@second-brain/typescript-config": "workspace:*",
     "@types/node": "^26.5.1",
-    "eslint": "^9.39.5",
+    "eslint": "^10.10.0",
     "typescript": "^6.0.3"
   }
 }
