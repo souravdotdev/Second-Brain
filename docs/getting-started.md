@@ -58,7 +58,7 @@ To run just one app: `pnpm --filter web dev` (or `api`, `worker`).
 ## Other common commands
 
 ```bash
-pnpm build         # production build for every app (tsc for api/worker, next build for web)
+pnpm build         # production build for every app (tsup for api/worker, next build for web)
 pnpm lint          # eslint across every package
 pnpm check-types   # tsc --noEmit across every package
 pnpm test          # vitest run across every package — see docs/testing.md
@@ -70,7 +70,7 @@ All of these (except `format`/`format:check`, which run Prettier directly rather
 
 These same checks (plus commit-message linting) also run automatically in CI on every push and PR — see [Code Quality](./code-quality.md#continuous-integration).
 
-**Known issue — `apps/api`/`apps/worker`'s `start` script doesn't work yet.** `pnpm build` (`tsc`) succeeds, but running the compiled output directly (`node dist/index.js`, what `start` does) currently fails with `ERR_MODULE_NOT_FOUND`. Node's ESM resolver requires relative imports in compiled output to include an explicit `.js` extension (e.g. `from "./routes/items.js"`); the source uses extensionless imports (`from "./routes/items"`), and `tsc` doesn't rewrite these for Node ESM output on its own. `dev` (via `tsx`) has always masked this, since `tsx` resolves extensionless imports the same way bundlers do — this gap has existed since these apps were first scaffolded, just never actually exercised until it was checked directly. Not fixed yet; needs a decision (add `.js` extensions to every relative import, switch `moduleResolution` to `nodenext`, or bundle for production with something like `tsup` instead of raw `tsc`) before these services can actually run in production as compiled output.
+`apps/api`/`apps/worker`'s `start` script (`node dist/index.js`) now actually works — `pnpm build` bundles them with `tsup` rather than emitting raw `tsc` output, specifically to solve two compounding problems plain `tsc` couldn't: Node's ESM resolver needs explicit `.js` extensions on relative imports (which the source doesn't have), and every `@second-brain/*` workspace package is plain TypeScript that was never compiled — plain `node` can't execute it at all, only bundler-based tools (`tsx` in dev, `tsup` in production) can. See [Architecture](./architecture.md#monorepo-layout) for the full explanation.
 
 ## Smoke-testing the save flow end to end
 
