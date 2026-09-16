@@ -47,6 +47,14 @@ pnpm format         # prettier --write . — reformats in place
 pnpm format:check   # prettier --check . — fails without writing, for CI
 ```
 
+## EditorConfig
+
+`.editorconfig` at the repo root — a single file, since EditorConfig cascades to every subdirectory from wherever `root = true` is set, so there's no per-package equivalent the way ESLint/TypeScript configs need one. It sets the baseline every editor (VS Code, WebStorm, Vim, etc.) applies _before_ Prettier ever runs — indentation, line endings, final newline, trailing whitespace — so a file looks right the moment it's opened, not just after a format pass. Values are kept in sync with `.prettierrc.json` (`indent_size: 2`, `max_line_length: 100` matching `printWidth`) so there's no drift between what the editor shows by default and what Prettier actually enforces.
+
+One override: `[*.md]` disables `trim_trailing_whitespace` — two trailing spaces at the end of a Markdown line is a deliberate forced line break, and most editors would otherwise strip it on save.
+
+This is a lower-level safety net than Prettier, not a replacement for it — Prettier via `lint-staged` is still what's actually enforced at commit time; EditorConfig just means an editor that doesn't run Prettier live (or hasn't loaded yet) still defaults to the right settings.
+
 ## Formatting vs. linting
 
 `eslint-config-prettier` is included in both shared ESLint configs specifically so ESLint never flags a formatting choice that Prettier would make differently — ESLint owns correctness/best-practice rules, Prettier owns whitespace/quotes/line-wrapping. There's no actual overlap or conflict by construction.
