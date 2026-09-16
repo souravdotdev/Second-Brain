@@ -8,7 +8,7 @@ Every app/package that reads `process.env` validates it through a Zod schema in 
 
 - `packages/db/src/env.ts` — `DATABASE_URL` must be a valid URL. Used by `src/client.ts` and `drizzle.config.ts`.
 - `packages/queue/src/env.ts` — `REDIS_URL` must be a valid URL. Used by `src/connection.ts`.
-- `apps/api/src/env.ts` — `PORT` (coerced to a number, defaults to `4000`). `DATABASE_URL`/`REDIS_URL` aren't re-validated here — importing `@second-brain/db`/`@second-brain/queue` already validates them at import time, so `apps/api` inherits that check for free.
+- `apps/api/src/env.ts` — `PORT` (coerced to a number, defaults to `4000`) and `CORS_ORIGIN` (must be a valid URL, defaults to `http://localhost:3000` — see [Security Middleware](./security.md)). `DATABASE_URL`/`REDIS_URL` aren't re-validated here — importing `@second-brain/db`/`@second-brain/queue` already validates them at import time, so `apps/api` inherits that check for free.
 - `apps/worker` — no `env.ts` of its own for the same reason: it only ever reads env vars indirectly through `@second-brain/db` and `@second-brain/queue`, both of which validate themselves.
 - `apps/web/src/env.ts` — `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:4000`). Imported as a side effect in `next.config.ts` so an invalid value fails `next dev`/`next build` immediately, before anything else runs.
 
@@ -29,6 +29,7 @@ Required for `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:studio`, and any ot
 | `PORT`         | Port the Fastify server listens on                                   | `4000`                                                       |
 | `DATABASE_URL` | Postgres connection string (via `@second-brain/db`)                  | `postgres://postgres:postgres@localhost:5433/universal_save` |
 | `REDIS_URL`    | Redis connection string (via `@second-brain/queue`, to enqueue jobs) | `redis://localhost:6380`                                     |
+| `CORS_ORIGIN`  | The web app's origin — the only one allowed to call this API         | `http://localhost:3000`                                      |
 
 ## `apps/worker/.env`
 

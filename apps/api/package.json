@@ -12,7 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@fastify/cors": "latest",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/helmet": "^13.1.1",
+    "@fastify/rate-limit": "^11.2.0",
     "@second-brain/core": "workspace:*",
     "@second-brain/db": "workspace:*",
     "@second-brain/queue": "workspace:*",
@@ -29,6 +31,7 @@
     "@second-brain/vitest-config": "workspace:*",
     "@types/node": "latest",
     "eslint": "^9.39.5",
+    "ioredis": "^6.0.0",
     "tsx": "latest",
     "typescript": "^6.0.3",
     "vitest": "^5.0.1"
