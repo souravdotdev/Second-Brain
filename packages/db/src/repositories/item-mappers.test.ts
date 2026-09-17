@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toCollection, toItem, toTag } from "./item-mappers";
+import { toCollection, toItem, toTag, toUser } from "./item-mappers";
 
 describe("toItem", () => {
   it("converts the Drizzle Date createdAt into an ISO string", () => {
@@ -46,5 +46,30 @@ describe("toCollection", () => {
     });
 
     expect(collection.createdAt).toBe("2026-03-01T00:00:00.000Z");
+  });
+});
+
+describe("toUser", () => {
+  it("converts createdAt to an ISO string and renames image to profileImg, dropping better-auth internals", () => {
+    const user = toUser({
+      id: "user-1",
+      email: "sourav@example.com",
+      emailVerified: true,
+      name: "Sourav Sanjay",
+      firstName: "Sourav",
+      lastName: "Sanjay",
+      image: "https://example.com/avatar.png",
+      createdAt: new Date("2026-04-01T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-01T00:00:00.000Z"),
+    });
+
+    expect(user).toEqual({
+      id: "user-1",
+      email: "sourav@example.com",
+      firstName: "Sourav",
+      lastName: "Sanjay",
+      profileImg: "https://example.com/avatar.png",
+      createdAt: "2026-04-01T00:00:00.000Z",
+    });
   });
 });
