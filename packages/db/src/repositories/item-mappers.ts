@@ -1,5 +1,5 @@
 import type { Collection, Item, Tag, User } from "@second-brain/types";
-import { collections, items, tags, users } from "../../schema/users";
+import { collections, items, tags, users } from "../../schema";
 
 // Postgres `timestamp` columns come back from Drizzle as native `Date`
 // objects; the domain entities in @second-brain/types declare `createdAt` as
