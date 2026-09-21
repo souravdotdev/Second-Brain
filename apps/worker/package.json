@@ -27,7 +27,7 @@
     "@second-brain/eslint-config": "workspace:*",
     "@second-brain/typescript-config": "workspace:*",
     "@second-brain/vitest-config": "workspace:*",
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "eslint": "^9.39.5",
     "tsup": "^8.5.1",
     "tsx": "^4.23.13",
