@@ -7,23 +7,23 @@ Feature list derived from a competitive analysis of [mymind.com](https://mymind.
 1. **Save/capture items** — URL, text note, image, document (single unified "item" model)
 2. **Note taking** — plain text/rich text notes
 3. **Basic keyword search**
-4. **Manual tagging** — simplest organization primitive before AI auto-tagging
-5. **Sync across devices** — cloud backend, not local-only (table stakes for a "second brain")
-6. **Accounts/auth**
-7. **Grid/masonry view UI**
+4. **Manual tagging** — simplest organization primitive
+5. **AI auto-tagging** — automatic organization alongside manual tags, the "no folders needed" pitch
+6. **Sync across devices** — cloud backend, not local-only (table stakes for a "second brain")
+7. **Accounts/auth**
+8. **Grid/masonry view UI**
 
 ## V1.x — Fast follow (rounds out capture, still no AI)
 
-8. **Chrome extension** — quick save without opening the app
-9. **Save entire articles** (reader-mode archive, not just a link)
-10. **Full-page screenshot capture**
-11. **PDF/document upload & storage**
-12. **Full-text search** across saved article/document content
-13. **Saving highlighted text** — capture a highlight + backlink to source
+9. **Chrome extension** — quick save without opening the app
+10. **Save entire articles** (reader-mode archive, not just a link)
+11. **Full-page screenshot capture**
+12. **PDF/document upload & storage**
+13. **Full-text search** across saved article/document content
+14. **Saving highlighted text** — capture a highlight + backlink to source
 
 ## V2 — Smart/differentiating features
 
-14. **Auto-tagging / AI organization** — the "no folders needed" pitch
 15. **AI summaries (TLDR)**
 16. **Text recognition from images (OCR)**
 17. **Smart spaces** — auto-grouped collections
@@ -33,22 +33,22 @@ Feature list derived from a competitive analysis of [mymind.com](https://mymind.
 21. **Focus mode**
 22. **Duplicate detection**
 
-## V3 — Platform expansion
+## V3 — Platform expansion & long-tail
 
-23. **iOS app**
-24. **Android app**
-25. **Bidirectional linking**
-26. **Rediscover/resurface** ("on this day" style nudges)
-27. **Shareable spaces** (public read-only links)
-28. **Offline access**
+23. **Bidirectional linking**
+24. **Rediscover/resurface** ("on this day" style nudges)
+25. **Shareable spaces** (public read-only links)
+26. **Offline access**
+27. **Recipe recognition**
+28. **Product/shopping recognition** (price + image extraction)
+29. **Handwriting recognition**
+30. **Apple ecosystem** — Shortcuts, widgets, Share Sheet, native macOS app
+31. **Import tools** — Pinterest, Instagram, Are.na
 
-## V4 — Long-tail / polish
+## V4 — Mobile apps
 
-29. **Recipe recognition**
-30. **Product/shopping recognition** (price + image extraction)
-31. **Handwriting recognition**
-32. **Apple ecosystem** — Shortcuts, widgets, Share Sheet, native macOS app
-33. **Import tools** — Pinterest, Instagram, Are.na
+32. **iOS app**
+33. **Android app**
 
 ## Not a version — a day-one architecture decision
 
